@@ -87,7 +87,7 @@ fun MainContent() {
                 .fillMaxSize()
                 .padding(padding)){
             Text(
-                text = "Hello, this is a simple Chess game. The game comes with a free widget. Enjoy!", modifier=Modifier.padding(20.dp)
+                text = "Hi, this is a simple puzzle game. It comes with a widget, so feel free to try that out too!", modifier=Modifier.padding(20.dp)
             )
             NumberGame()
         }

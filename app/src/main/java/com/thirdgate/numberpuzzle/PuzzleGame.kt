@@ -107,11 +107,11 @@ fun Array<Array<NumberBlock>>.deepCopy(): Array<Array<NumberBlock>> {
 fun NumberGame() {
     val rows = 4
     val columns = 4
-    val board = remember { mutableStateOf(initialBoard(rows=rows, columns=columns)) }
+    val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
 
     fun isAdjacentToEmptyBlock(pos1: Pair<Int, Int>, pos2: Pair<Int, Int>): Boolean {
         return (abs(pos1.first - pos2.first) == 1 && pos1.second == pos2.second) ||
-               (abs(pos1.second - pos2.second) == 1 && pos1.first == pos2.first)
+                (abs(pos1.second - pos2.second) == 1 && pos1.first == pos2.first)
     }
 
     fun onCellClick(clickRow: Int, clickCol: Int) {
@@ -120,14 +120,20 @@ fun NumberGame() {
 
             board.value[clickRow][clickCol] = NumberBlock(-1)
 
-            Log.i("Game","click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}")
-            board.value[emptyBlockPosition.first][emptyBlockPosition.second].number = clickedBlock.number
+            Log.i(
+                "Game",
+                "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+            )
+            board.value[emptyBlockPosition.first][emptyBlockPosition.second].number =
+                clickedBlock.number
             // Update the empty block's position
             emptyBlockPosition = Pair(clickRow, clickCol)
-            Log.i("Game","click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}")
-        }
-        else {
-            Log.w("Game","click $clickRow,$clickCol not adjacent to $emptyBlockPosition")
+            Log.i(
+                "Game",
+                "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+            )
+        } else {
+            Log.w("Game", "click $clickRow,$clickCol not adjacent to $emptyBlockPosition")
         }
 
     }
@@ -135,16 +141,15 @@ fun NumberGame() {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
         Column(modifier = Modifier.background(Color.Gray).fillMaxWidth()) {
             board.value.forEachIndexed { rowIndex, row ->
-                Row(modifier=Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     row.forEachIndexed { colIndex, cell ->
-                        val myBoxColor:Color
-                        val myTextColor:Color
-                        if (cell.number == rowIndex*rows+colIndex+1 || (cell.number == -1 && (rowIndex*rows)+colIndex+1 == rows*columns)) {
+                        val myBoxColor: Color
+                        val myTextColor: Color
+                        if (cell.number == rowIndex * rows + colIndex + 1 || (cell.number == -1 && (rowIndex * rows) + colIndex + 1 == rows * columns)) {
 
                             myBoxColor = MaterialTheme.colorScheme.primary
                             myTextColor = MaterialTheme.colorScheme.onPrimary
-                        }
-                        else {
+                        } else {
                             myBoxColor = MaterialTheme.colorScheme.error
                             myTextColor = MaterialTheme.colorScheme.onError
                         }
@@ -154,7 +159,8 @@ fun NumberGame() {
                                 .aspectRatio(1f)
                                 .background(myBoxColor)
                                 .border(width = 1.dp, color = Color.Black, shape = RectangleShape)
-                                .clickable { onCellClick(rowIndex, colIndex)
+                                .clickable {
+                                    onCellClick(rowIndex, colIndex)
                                     val updatedBoard = board.value.deepCopy()  // Create a deep copy
                                     board.value =
                                         updatedBoard  // Assign the updated board to the state, triggering recomposition
@@ -177,21 +183,18 @@ fun NumberGame() {
                                     color = Color.White
                                 )
                             }
-                            }
                         }
                     }
                 }
             }
-
-    }
-
+        }
         Spacer(modifier = Modifier.height(32.dp))
-
         ResetButton {
             // This will reset the game state
             board.value = initialBoard(rows, columns)
         }
     }
+}
 
 @Composable
 fun ResetButton(onClick: () -> Unit) {

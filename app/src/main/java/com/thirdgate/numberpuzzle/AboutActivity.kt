@@ -55,11 +55,11 @@
             Spacer(modifier = Modifier.height(16.dp))
             Text("App Source Code", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(
-                "github.com/ddxv/chess-widget",
+                "github.com/ddxv/NumberPuzzle",
                 fontSize = 20.sp,
                 modifier = Modifier.clickable {
                     val intent =
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ddxv/chess-widget"))
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ddxv/NumberPuzzle"))
                     currentContext.value.startActivity(intent)
                 }
             )
