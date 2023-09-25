@@ -136,12 +136,14 @@ fun NumberGame() {
     val startColor = colors.first
     val endColor = colors.second
 
+    var resetCounter by remember { mutableStateOf(0) }
+
     val rows = 4
     val columns = 4
     val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
 
     // Update the index for the next recomposition
-    LaunchedEffect(board.value) {
+    LaunchedEffect(resetCounter) {
         colorIndex = (colorIndex + 1) % colorSets.size
     }
 
@@ -235,6 +237,7 @@ fun NumberGame() {
         ResetButton(startColor) {
             // This will reset the game state
             board.value = initialBoard(rows, columns)
+            resetCounter++
         }
     }
 }
