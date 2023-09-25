@@ -7,14 +7,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import kotlin.math.abs
@@ -103,11 +109,41 @@ fun Array<Array<NumberBlock>>.deepCopy(): Array<Array<NumberBlock>> {
     return Array(this.size) { this[it].clone() }
 }
 
+
+
+
 @Composable
 fun NumberGame() {
+
+    // Define the sets of colors
+    val colorSets = listOf(
+        Pair(Color(0xFFD449FF), Color(0xFF6CBAFF)),
+        Pair(Color(0xFFF837A4), Color(0xFFD6EE6F)),
+        Pair(Color(0xFFF7DE00), Color(0xFF0E9785)),
+        Pair(Color(0xFF7647FF), Color(0xFFFF7A38)),
+        Pair(Color(0xFF926119), Color(0xFF186188))
+    )
+
+    // Mutable state to keep track of the current index
+    var colorIndex by remember { mutableStateOf(0) }
+
+
+
+
+    // Fetch the current set of colors
+    val colors = colorSets[colorIndex]
+
+    val startColor = colors.first
+    val endColor = colors.second
+
     val rows = 4
     val columns = 4
     val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
+
+    // Update the index for the next recomposition
+    LaunchedEffect(board.value) {
+        colorIndex = (colorIndex + 1) % colorSets.size
+    }
 
     fun isAdjacentToEmptyBlock(pos1: Pair<Int, Int>, pos2: Pair<Int, Int>): Boolean {
         return (abs(pos1.first - pos2.first) == 1 && pos1.second == pos2.second) ||
@@ -143,22 +179,29 @@ fun NumberGame() {
             board.value.forEachIndexed { rowIndex, row ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     row.forEachIndexed { colIndex, cell ->
+//                        val positionRatio = (rowIndex * rows + colIndex).toFloat() / (rows * columns - 1)
+//                        val interpolatedColor = lerp(startColor, endColor, positionRatio)
+
+                        val positionRatio = if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
+                        val interpolatedColor = lerp(startColor, endColor, positionRatio)
+
+
                         val myBoxColor: Color
                         val myTextColor: Color
-                        if (cell.number == rowIndex * rows + colIndex + 1 || (cell.number == -1 && (rowIndex * rows) + colIndex + 1 == rows * columns)) {
-
-                            myBoxColor = MaterialTheme.colorScheme.primary
+                        if (cell.number == -1) {
+                            myBoxColor = endColor
                             myTextColor = MaterialTheme.colorScheme.onPrimary
                         } else {
-                            myBoxColor = MaterialTheme.colorScheme.error
-                            myTextColor = MaterialTheme.colorScheme.onError
+                            myBoxColor = interpolatedColor
+                            myTextColor = MaterialTheme.colorScheme.onPrimary
                         }
+
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(myBoxColor)
-                                .border(width = 1.dp, color = Color.Black, shape = RectangleShape)
+                                .border(width = 1.dp, color = MaterialTheme.colorScheme.background, shape = RectangleShape)
                                 .clickable {
                                     onCellClick(rowIndex, colIndex)
                                     val updatedBoard = board.value.deepCopy()  // Create a deep copy
@@ -189,7 +232,7 @@ fun NumberGame() {
             }
         }
         Spacer(modifier = Modifier.height(32.dp))
-        ResetButton {
+        ResetButton(startColor) {
             // This will reset the game state
             board.value = initialBoard(rows, columns)
         }
@@ -197,8 +240,10 @@ fun NumberGame() {
 }
 
 @Composable
-fun ResetButton(onClick: () -> Unit) {
-    androidx.compose.material3.Button(onClick = onClick) { Text("Reset")
+fun ResetButton(myColor:Color, onClick: () -> Unit) {
+    androidx.compose.material3.Button(onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = myColor)
+    ) { Text("Reset")
     }
 }
 
