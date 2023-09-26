@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,7 +111,73 @@ fun Array<Array<NumberBlock>>.deepCopy(): Array<Array<NumberBlock>> {
 }
 
 
+fun onCellClick(board: MutableState<Array<Array<NumberBlock>>>, clickRow: Int, clickCol: Int) {
+    if (isAdjacentToEmptyBlock(Pair(clickRow, clickCol), emptyBlockPosition)) {
+        val clickedBlock = board.value[clickRow][clickCol]
+        board.value[clickRow][clickCol] = NumberBlock(-1)
+        Log.i(
+            "Game",
+            "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+        )
+        board.value[emptyBlockPosition.first][emptyBlockPosition.second].number =
+            clickedBlock.number
+        // Update the empty block's position
+        emptyBlockPosition = Pair(clickRow, clickCol)
+        Log.i(
+            "Game",
+            "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+        )
+    } else if (clickRow == emptyBlockPosition.first) {
+        if (emptyBlockPosition.second < clickCol) {
+            for (i in emptyBlockPosition.second + 1 until clickCol + 1) {
+                Log.i("Game", "left to right $i")
+                val newNum = board.value[clickRow][i].number
+                board.value[emptyBlockPosition.first][i - 1].number = newNum
+            }
+        } else {
+            for (i in emptyBlockPosition.second downTo clickCol + 1) {
+                Log.i("Game", "YES $i")
+                val newNum = board.value[clickRow][i - 1].number
+                board.value[emptyBlockPosition.first][i].number = newNum
+            }
+        }
+        Log.i(
+            "Game",
+            "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+        )
+        // Update the empty block's position
+        board.value[clickRow][clickCol] = NumberBlock(-1)
+        emptyBlockPosition = Pair(clickRow, clickCol)
+    } else if (clickCol == emptyBlockPosition.second) {
+        if (emptyBlockPosition.first < clickRow) {
+            for (i in emptyBlockPosition.first + 1 until clickRow + 1) {
+                Log.i("Game", "left to right $i")
+                val newNum = board.value[i][clickCol].number
+                board.value[i - 1][emptyBlockPosition.second].number = newNum
+            }
+        } else {
+            for (i in emptyBlockPosition.first downTo clickRow + 1) {
+                Log.i("Game", "YES $i")
+                val newNum = board.value[i - 1][clickCol].number
+                board.value[i][emptyBlockPosition.second].number = newNum
+            }
+        }
+        Log.i(
+            "Game",
+            "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
+        )
+        // Update the empty block's position
+        board.value[clickRow][clickCol] = NumberBlock(-1)
+        emptyBlockPosition = Pair(clickRow, clickCol)
+    } else {
+        Log.w("Game", "click $clickRow,$clickCol not adjacent to $emptyBlockPosition")
+    }
+}
 
+fun isAdjacentToEmptyBlock(pos1: Pair<Int, Int>, pos2: Pair<Int, Int>): Boolean {
+    return (abs(pos1.first - pos2.first) == 1 && pos1.second == pos2.second) ||
+            (abs(pos1.second - pos2.second) == 1 && pos1.first == pos2.first)
+}
 
 @Composable
 fun NumberGame() {
@@ -126,9 +193,6 @@ fun NumberGame() {
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
-
-
-
 
     // Fetch the current set of colors
     val colors = colorSets[colorIndex]
@@ -147,46 +211,18 @@ fun NumberGame() {
         colorIndex = (colorIndex + 1) % colorSets.size
     }
 
-    fun isAdjacentToEmptyBlock(pos1: Pair<Int, Int>, pos2: Pair<Int, Int>): Boolean {
-        return (abs(pos1.first - pos2.first) == 1 && pos1.second == pos2.second) ||
-                (abs(pos1.second - pos2.second) == 1 && pos1.first == pos2.first)
-    }
 
-    fun onCellClick(clickRow: Int, clickCol: Int) {
-        if (isAdjacentToEmptyBlock(Pair(clickRow, clickCol), emptyBlockPosition)) {
-            val clickedBlock = board.value[clickRow][clickCol]
 
-            board.value[clickRow][clickCol] = NumberBlock(-1)
 
-            Log.i(
-                "Game",
-                "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
-            )
-            board.value[emptyBlockPosition.first][emptyBlockPosition.second].number =
-                clickedBlock.number
-            // Update the empty block's position
-            emptyBlockPosition = Pair(clickRow, clickCol)
-            Log.i(
-                "Game",
-                "click=$clickRow,$clickCol e:$emptyBlockPosition:${board.value[emptyBlockPosition.first][emptyBlockPosition.second]}"
-            )
-        } else {
-            Log.w("Game", "click $clickRow,$clickCol not adjacent to $emptyBlockPosition")
-        }
 
-    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
         Column(modifier = Modifier.background(Color.Gray).fillMaxWidth()) {
             board.value.forEachIndexed { rowIndex, row ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     row.forEachIndexed { colIndex, cell ->
-//                        val positionRatio = (rowIndex * rows + colIndex).toFloat() / (rows * columns - 1)
-//                        val interpolatedColor = lerp(startColor, endColor, positionRatio)
-
                         val positionRatio = if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
                         val interpolatedColor = lerp(startColor, endColor, positionRatio)
-
 
                         val myBoxColor: Color
                         val myTextColor: Color
@@ -205,7 +241,7 @@ fun NumberGame() {
                                 .background(myBoxColor)
                                 .border(width = 1.dp, color = MaterialTheme.colorScheme.background, shape = RectangleShape)
                                 .clickable {
-                                    onCellClick(rowIndex, colIndex)
+                                    onCellClick(board, rowIndex, colIndex)
                                     val updatedBoard = board.value.deepCopy()  // Create a deep copy
                                     board.value =
                                         updatedBoard  // Assign the updated board to the state, triggering recomposition
