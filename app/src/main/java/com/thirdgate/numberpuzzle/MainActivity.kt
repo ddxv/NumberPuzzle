@@ -91,13 +91,7 @@ fun MainContent() {
             Text(
                 text = "Hi, this is a simple puzzle game. It comes with a widget, so feel free to try that out too!", modifier=Modifier.padding(20.dp)
             )
-
-
-
-
-
             NumberGame()
-
         }
     }
 
