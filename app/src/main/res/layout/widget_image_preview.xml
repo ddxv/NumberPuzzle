@@ -17,7 +17,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="210dp"
     android:layout_height="186dp"
-    android:background="@drawable/ttc_preview">
+    android:background="@drawable/widget_screenshot">
 
     <TextView
         android:layout_width="match_parent"

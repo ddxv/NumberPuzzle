@@ -6,7 +6,7 @@
     android:minHeight="96dp"
     android:minResizeWidth="130dp"
     android:minResizeHeight="130dp"
-    android:previewImage="@drawable/ttc_preview"
+    android:previewImage="@drawable/widget_screenshot"
     android:previewLayout="@layout/widget_image_preview"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="3"
