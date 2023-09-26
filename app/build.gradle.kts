@@ -1,16 +1,17 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
     namespace = "com.thirdgate.numberpuzzle"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.thirdgate.numberpuzzle"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -40,7 +41,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -51,7 +52,18 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
+
+    // Serialization for DataStore
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.0.0")
+
+    // For Glance interop APIs with Material 3
+    implementation("androidx.glance:glance-material3:1.0.0")
+
+
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))

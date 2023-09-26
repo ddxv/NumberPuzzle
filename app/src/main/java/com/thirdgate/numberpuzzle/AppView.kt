@@ -22,18 +22,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 @Composable
 fun NumberGame() {
 
-    // Define the sets of colors
-    val colorSets = listOf(
-        Pair(Color(0xFFD449FF), Color(0xFF6CBAFF)),
-        Pair(Color(0xFFF837A4), Color(0xFFD6EE6F)),
-        Pair(Color(0xFFF7DE00), Color(0xFF0E9785)),
-        Pair(Color(0xFF7647FF), Color(0xFFFF7A38)),
-        Pair(Color(0xFF926119), Color(0xFF186188))
-    )
+
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
