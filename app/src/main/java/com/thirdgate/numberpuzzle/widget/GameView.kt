@@ -19,6 +19,7 @@ import androidx.glance.ButtonColors
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalGlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.ActionCallback
@@ -26,6 +27,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -34,6 +36,7 @@ import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -47,7 +50,7 @@ import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 
 @Composable
-fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:Int, rows:Int, columns:Int) {
+fun PuzzleGameGlance(context:Context) {
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
@@ -62,17 +65,29 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
 
     var resetCounter by remember { mutableStateOf(0) }
 
-    val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
 
     // Update the index for the next recomposition
     LaunchedEffect(resetCounter) {
         colorIndex = (colorIndex + 1) % colorSets.size
     }
+    val glanceId = LocalGlanceId.current
+
+    val widgetInfo = currentState<WidgetInfo>()
+    val numGames = widgetInfo.games
+    val numWins = widgetInfo.wins
+    var rows = widgetInfo.rows
+    var columns = widgetInfo.columns
+
+    Log.i("Widget", "Start Size=$rows,$columns")
+    val firstBoard =initialBoard(rows = rows, columns = columns)
+
+    val board = remember { mutableStateOf(firstBoard) }
+
 
     GlanceTheme {
         GameTitleText(numWins, endColor)
         LazyColumn(
-            modifier = GlanceModifier.padding(8.dp),
+            modifier = GlanceModifier.padding(2.dp).background(endColor),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             itemsIndexed(board.value) { rowIndex, row ->
@@ -86,6 +101,7 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
                             row.forEachIndexed { colIndex, cell ->
                                 val positionRatio =
                                     if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
+                                Log.i("Game", "colorpos=$positionRatio")
                                 val interpolatedColor =
                                     lerp(startColor, endColor, positionRatio)
 
@@ -132,16 +148,30 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
                                         )
                                     }
                                 }
+                                if (colIndex < board.value[rowIndex].indices.last) {
+                                    Spacer(
+                                        modifier = GlanceModifier
+                                            .width(2.dp)
+                                            .background(GlanceTheme.colors.background)
+                                    )
+                                }
                             }
+                        }
+                        if (rowIndex < board.value[rowIndex].indices.last) {
+                            Spacer(
+                                modifier = GlanceModifier
+                                    .height(2.dp)
+                                    .padding(top = 2.dp, bottom = 2.dp)
+                                    .background(GlanceTheme.colors.background)
+                            )
                         }
                     }
                 }
             }
-
             item {
-                Spacer(modifier = GlanceModifier.height(32.dp))
                 val checkInversions = sumInversions(board.value)
                 if ((checkInversions <= 1 && board.value[rows-1][columns-1].number == -1) || isGameOver) {
+                    Spacer(modifier = GlanceModifier.height(32.dp))
                     if (!isGameOver) {
                         isGameOver = true
                         Log.i("Game", "Inversions=$checkInversions resetting game")

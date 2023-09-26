@@ -80,7 +80,6 @@ class ConfigurationActivity : ComponentActivity() {
                 }
             }
 
-            //glanceAppWidget.update(context, glanceWidgetId)
         } catch (e: IllegalArgumentException) {
             Log.d("WidgetConfig", "No GlanceId found for this appWidgetId.")
             setContent {
@@ -229,7 +228,9 @@ fun FinishButton(
                     updateState = { widgetInfo ->
                         WidgetInfo(
                             rows = rows,
-                            columns = columns
+                            columns = columns,
+                            wins = widgetInfo.wins,
+                            games = widgetInfo.games,
                         )
                     }
                 )

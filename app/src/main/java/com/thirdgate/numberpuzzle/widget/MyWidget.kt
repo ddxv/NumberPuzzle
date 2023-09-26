@@ -37,13 +37,6 @@ class MyWidget : GlanceAppWidget() {
             "MyWidget",
             "Content: start"
         )
-        val widgetInfo = currentState<WidgetInfo>()
-        val numGames = widgetInfo.games
-        val numWins = widgetInfo.wins
-        var rows = widgetInfo.rows
-        val glanceId = LocalGlanceId.current
-
-        Log.i("MyWidget", "Content: numGames=$numGames: check numWins=$numWins")
 
         GlanceTheme {
             Column(
@@ -53,8 +46,7 @@ class MyWidget : GlanceAppWidget() {
                     .background(GlanceTheme.colors.background)
                     .cornerRadius(8.dp)
             ) {
-                            Log.i("MyWidget", "Content: got imageProvider")
-                            PuzzleGameGlance(glanceId, context, numWins, numGames, rows=rows, columns=rows)
+                            PuzzleGameGlance(context)
                     }
 
             }
@@ -71,6 +63,8 @@ fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:I
                 WidgetInfo(
                     games = games,
                     wins = wins,
+                    rows = widgetInfo.rows,
+                    columns = widgetInfo.columns,
                 )
             }
         )
