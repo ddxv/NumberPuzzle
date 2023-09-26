@@ -10,7 +10,7 @@ data class NumberBlock(var number: Int)
 lateinit var emptyBlockPosition : Pair<Int, Int>
 
 
-fun countInversions(board: Array<Array<NumberBlock>>, width: Int): Int {
+fun sumInversions(board: Array<Array<NumberBlock>>): Int {
     val rows = board.size
     val cols = board[0].size
 
@@ -20,29 +20,25 @@ fun countInversions(board: Array<Array<NumberBlock>>, width: Int): Int {
             for (k in i until rows) {
                 for (l in (if (i == k) j + 1 else 0) until cols) {
                     Log.i("Game", "countInversion: $i,$j tv=${board[i][j].number} > kl=$k,$l ${board[k][l].number}")
-                    if (board[i][j].number > board[k][l].number) {
+                    if (board[i][j].number > board[k][l].number && board[i][j].number != -1 && board[k][l].number != -1) {
                         inversions++
                     }
                 }
             }
         }
     }
-    return inversions
-}
-
-fun sumInversions(board: Array<Array<NumberBlock>>, width: Int): Int {
-    val inversions = countInversions(board, width)
     Log.i("Game", "sumInversions:$inversions")
     return inversions
 }
 
+
 fun isSolvable(board: Array<Array<NumberBlock>>, width: Int, height: Int, emptyRow: Int): Boolean {
     return if (width % 2 == 1) { // odd
         Log.i("Game", "isSolvable width is odd, start")
-        sumInversions(board, width=width) % 2 == 0
+        sumInversions(board) % 2 == 0
     } else { // even
         Log.i("Game", "isSolvable width is even, start")
-        (sumInversions(board, width) + height - emptyRow) % 2 == 0
+        (sumInversions(board) + height - emptyRow) % 2 == 0
     }
 }
 

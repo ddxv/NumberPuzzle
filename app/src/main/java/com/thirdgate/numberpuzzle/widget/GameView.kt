@@ -14,13 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.Button
+import androidx.glance.ButtonColors
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.ActionCallback
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.background
@@ -28,7 +30,9 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -38,6 +42,7 @@ import androidx.glance.unit.ColorProvider
 import com.thirdgate.numberpuzzle.deepCopy
 import com.thirdgate.numberpuzzle.initialBoard
 import com.thirdgate.numberpuzzle.onCellClick
+import com.thirdgate.numberpuzzle.sumInversions
 import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 
@@ -53,33 +58,21 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
     val startColor = colors.first
     val endColor = colors.second
 
+    var isGameOver = false
+
     var resetCounter by remember { mutableStateOf(0) }
 
-    val rows = 4
-    val columns = 4
+    val rows = 3
+    val columns = 3
     val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
-
-
-//    val boardSize = 3
-//    var currentPlayer = remember { mutableStateOf(Player.X) }
-//    var board = remember { mutableStateOf(Array(boardSize) { Array(boardSize) { Player.NONE } }) }
-//    var winner:MutableState<Player> = remember { mutableStateOf(Player.NONE) }
-//    val lineEdgePadding = 20.dp
-
-    // TODO: Use?
-    val widgetSize = LocalSize.current
-    val boxSize = widgetSize.height.value
 
     // Update the index for the next recomposition
     LaunchedEffect(resetCounter) {
         colorIndex = (colorIndex + 1) % colorSets.size
     }
 
-    Log.i("Widget", "WidgetGameStart boxSize=$boxSize")
-
     GlanceTheme {
-        GameStatusText(numWins)
-        Text("Number puzzle widget game")
+        GameTitleText(numWins, endColor)
         LazyColumn(
             modifier = GlanceModifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,92 +84,97 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
                     Column(
                         modifier = GlanceModifier.background(Color.Gray).fillMaxWidth()
                     ) {
-                            Row(modifier = GlanceModifier.fillMaxWidth()) {
-                                row.forEachIndexed { colIndex, cell ->
-                                    val positionRatio =
-                                        if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
-                                    val interpolatedColor =
-                                        lerp(startColor, endColor, positionRatio)
+                        Row(modifier = GlanceModifier.fillMaxWidth()) {
+                            row.forEachIndexed { colIndex, cell ->
+                                val positionRatio =
+                                    if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
+                                val interpolatedColor =
+                                    lerp(startColor, endColor, positionRatio)
 
-                                    val myBoxColor: Color
-                                    val myTextColor: Color
+                                val myBoxColor: Color
+                                val myTextColor: Color
+                                if (cell.number == -1) {
+                                    myBoxColor = endColor
+                                    myTextColor = MaterialTheme.colorScheme.onPrimary
+                                } else {
+                                    myBoxColor = interpolatedColor
+                                    myTextColor = MaterialTheme.colorScheme.onPrimary
+                                }
+
+                                Box(
+                                    modifier = GlanceModifier
+                                        .defaultWeight()
+                                        .background(myBoxColor)
+                                        .clickable {
+                                            onCellClick(board, rowIndex, colIndex)
+                                            val updatedBoard =
+                                                board.value.deepCopy()
+                                            board.value =
+                                                updatedBoard
+
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (cell.number != -1) {
+                                        Text(
+                                            text = cell.number.toString(),
+                                            style = TextStyle(
+                                                fontSize = 40.sp,
+                                                color = ColorProvider(myTextColor)
+                                            ),
+                                        )
+                                    }
                                     if (cell.number == -1) {
-                                        myBoxColor = endColor
-                                        myTextColor = MaterialTheme.colorScheme.onPrimary
-                                    } else {
-                                        myBoxColor = interpolatedColor
-                                        myTextColor = MaterialTheme.colorScheme.onPrimary
+                                        Text(
+                                            text = "",
+                                            style = TextStyle(
+                                                fontSize = 40.sp,
+                                                color = ColorProvider(Color.White)
+                                            ),
+                                        )
                                     }
-
-                                    Box(
-                                        modifier = GlanceModifier
-                                            .defaultWeight()
-                                            //.aspectRatio(1f)
-                                            .background(myBoxColor)
-//                                            .border(
-//                                                width = 1.dp,
-//                                                color = MaterialTheme.colorScheme.background,
-//                                                shape = RectangleShape
-//                                            )
-                                            .clickable {
-                                                onCellClick(board, rowIndex, colIndex)
-                                                val updatedBoard =
-                                                    board.value.deepCopy()  // Create a deep copy
-                                                board.value =
-                                                    updatedBoard  // Assign the updated board to the state, triggering recomposition
-
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (cell.number != -1) {
-                                            Text(
-                                                text = cell.number.toString(),
-                                                style = TextStyle(
-                                                    fontSize = 40.sp,
-                                                    color = ColorProvider(myTextColor)
-                                                ),
-                                            )
-                                        }
-                                        if (cell.number == -1) {
-                                            Text(
-                                                text = "",
-                                                style = TextStyle(fontSize = 40.sp, color= ColorProvider(Color.White)),
-                                            )
-                                        }
-                                    }
-                                //}
+                                }
                             }
                         }
                     }
-//                    ResetButton(startColor) {
-//                        // This will reset the game state
-//                        board.value = initialBoard(rows, columns)
-//                        resetCounter++
-//                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = GlanceModifier.height(32.dp))
+                val checkInversions = sumInversions(board.value)
+                if ((checkInversions <= 1 && board.value[rows-1][columns-1].number == -1) || isGameOver) {
+                    if (!isGameOver) {
+                        isGameOver = true
+                        Log.i("Game", "Inversions=$checkInversions resetting game")
+                        var games: Int = numGames + 1
+                        var wins: Int = numWins + 1
+                        updateWidgetInfo(
+                            context = context,
+                            glanceWidgetId = glanceId,
+                            wins = wins,
+                            games = games
+                        )
+                    }
+                    GameOverView(endColor) {
+                        resetCounter++
+                        board.value = initialBoard(rows = rows, columns = columns)
+                        actionRunCallback<RefreshAction>()
+                    }
+                } else {
+                    //GamesWonText(numWins = numWins, games = numGames)
                 }
             }
 
         }
-        Text("Bottom of Widget!")
-        GamesWonText(numWins = numWins, games = numGames)
-        //Spacer(modifier = GlanceModifier.height(32.dp))
     }
 }
 
 
-//@Composable
-//fun ResetButton(myColor: Color, onClick: () -> Unit) {
-//    Button(
-//        onClick = onClick,
-//        colors = ButtonDefaults.buttonColors(containerColor = myColor)
-//    ) {
-//        Text("Reset")
-//    }
-//}
 
 @Composable
-fun GameStatusText(wins:Int) {
-    val displayText =if (wins > 0)  "Puzzle's Completed: $wins" else "Sort starting from 1"
+fun GameTitleText(wins:Int, myColor:Color) {
+    val displayText =if (wins > 0)  "Puzzles Completed: $wins" else "Sort starting from 1"
     Row(horizontalAlignment = Alignment.CenterHorizontally, modifier = GlanceModifier.fillMaxWidth()) {
         Text(
             text = displayText,
@@ -184,7 +182,7 @@ fun GameStatusText(wins:Int) {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color=GlanceTheme.colors.onBackground
+                color= ColorProvider(myColor)
             )
         )
     }
@@ -192,12 +190,7 @@ fun GameStatusText(wins:Int) {
 
 @Composable
 fun GamesWonText(numWins: Int, games:Int) {
-    val displayText = if (games > 0) {
-       "Games: $games, Won: $numWins, Draw: ${games - (numWins)}"
-    }
-    else {
-        ""
-    }
+    val displayText = "Puzzles completed: $numWins"
     Row(horizontalAlignment = Alignment.CenterHorizontally, modifier = GlanceModifier.fillMaxWidth()) {
         Text(
             text = displayText,
@@ -210,14 +203,15 @@ fun GamesWonText(numWins: Int, games:Int) {
     }
 }
 
-//@Composable
-//fun GameOverView(onReset: () -> Unit) {
-//    Spacer(modifier = GlanceModifier.height(20.dp))
-//    Button(
-//        text = "Reset",
-//        onClick = onReset
-//    )
-//}
+@Composable
+fun GameOverView(myColor:Color, onReset: () -> Unit) {
+    Spacer(modifier = GlanceModifier.height(20.dp))
+    Button(
+        text = "New Puzzle",
+        onClick = onReset,
+        modifier = GlanceModifier.background(color = myColor),
+    )
+}
 
 class RefreshAction : ActionCallback {
     override suspend fun onAction(

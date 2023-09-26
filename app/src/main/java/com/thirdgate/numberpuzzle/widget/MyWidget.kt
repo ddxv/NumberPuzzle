@@ -39,7 +39,6 @@ class MyWidget : GlanceAppWidget() {
         val widgetInfo = currentState<WidgetInfo>()
         val numGames = widgetInfo.games
         val numWins = widgetInfo.wins
-        val numLosses = widgetInfo.losses
         val glanceId = LocalGlanceId.current
 
         Log.i("MyWidget", "Content: numGames=$numGames: check numWins=$numWins")
