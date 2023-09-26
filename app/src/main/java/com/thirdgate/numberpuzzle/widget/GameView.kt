@@ -47,7 +47,7 @@ import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 
 @Composable
-fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:Int) {
+fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:Int, rows:Int, columns:Int) {
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
@@ -62,8 +62,6 @@ fun PuzzleGameGlance(glanceId: GlanceId, context:Context, numWins:Int, numGames:
 
     var resetCounter by remember { mutableStateOf(0) }
 
-    val rows = 3
-    val columns = 3
     val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
 
     // Update the index for the next recomposition

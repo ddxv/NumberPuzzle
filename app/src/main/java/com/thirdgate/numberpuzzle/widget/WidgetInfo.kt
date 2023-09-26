@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 data class WidgetInfo(
     val games: Int = 0,
     val wins: Int = 0,
+    val rows: Int = 3,
+    val columns: Int = 3,
 )
 
 

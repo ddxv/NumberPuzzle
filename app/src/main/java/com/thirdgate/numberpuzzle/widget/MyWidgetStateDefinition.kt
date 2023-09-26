@@ -15,7 +15,7 @@ import java.io.OutputStream
 /**
  * Provides our own definition of "Glance state" using Kotlin serialization.
  */
-class GlanceButtonWidgetStateDefinition : GlanceStateDefinition<WidgetInfo> {
+class MyWidgetStateDefinition : GlanceStateDefinition<WidgetInfo> {
 
     val DATASTORE_FILE_PREFIX = "numberpuzzle_widget_"
 

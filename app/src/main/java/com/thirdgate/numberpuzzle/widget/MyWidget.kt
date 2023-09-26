@@ -22,7 +22,8 @@ import androidx.glance.layout.fillMaxSize
 
 class MyWidget : GlanceAppWidget() {
 
-    override val stateDefinition = GlanceButtonWidgetStateDefinition()
+    override val stateDefinition = MyWidgetStateDefinition()
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         Log.i("MyWidget", "provideGlance started")
         provideContent {
@@ -39,6 +40,7 @@ class MyWidget : GlanceAppWidget() {
         val widgetInfo = currentState<WidgetInfo>()
         val numGames = widgetInfo.games
         val numWins = widgetInfo.wins
+        var rows = widgetInfo.rows
         val glanceId = LocalGlanceId.current
 
         Log.i("MyWidget", "Content: numGames=$numGames: check numWins=$numWins")
@@ -52,7 +54,7 @@ class MyWidget : GlanceAppWidget() {
                     .cornerRadius(8.dp)
             ) {
                             Log.i("MyWidget", "Content: got imageProvider")
-                            PuzzleGameGlance(glanceId, context, numWins, numGames)
+                            PuzzleGameGlance(glanceId, context, numWins, numGames, rows=rows, columns=rows)
                     }
 
             }
@@ -64,7 +66,7 @@ fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:I
     LaunchedEffect(key1=Unit) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,
-            definition = GlanceButtonWidgetStateDefinition(),
+            definition = MyWidgetStateDefinition(),
             updateState = { widgetInfo ->
                 WidgetInfo(
                     games = games,
