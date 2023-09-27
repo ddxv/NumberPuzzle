@@ -85,11 +85,11 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
    val board: MutableState<Board>
     if (boardState == null) {
         board = remember { mutableStateOf(Board(rows=rows, cols=columns)) }
-        Log.i("Widget", "Start Size=$rows,$columns, ${board.value.grid[0][0].number} create new")
+        Log.i("Widget", "Start Size=$rows,$columns: ${board.value.grid[0][0].number},${board.value.grid[0][1].number} create new")
     }
     else{
         board = remember { mutableStateOf(boardState) }
-        Log.i("Widget", "Start Size=$rows,$columns, ${board.value.grid[0][0].number} loaded existing")
+        Log.i("Widget", "Start Size=$rows,$columns: ${board.value.grid[0][0].number},${board.value.grid[0][1].number} loaded existing")
     }
 
 
@@ -101,7 +101,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
             Text(
                 text = displayText,
                 style = TextStyle(
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color= ColorProvider(endColor)
@@ -155,7 +155,6 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
                                         .background(myBoxColor)
                                         .clickable {
                                             onCellClick(board, rowIndex, colIndex)
-//                                            val updatedBoard = board.value.grid.deepCopy()
                                             val updatedBoard = board.value.deepCopy()
                                             board.value = updatedBoard
 
@@ -224,7 +223,6 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
                         actionRunCallback<RefreshAction>()
                     }
                 } else {
-                    Log.i("Game", "Save board to disk")
                     updateWidgetInfo(
                         context = context,
                         glanceWidgetId = glanceId,

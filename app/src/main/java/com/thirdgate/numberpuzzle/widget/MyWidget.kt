@@ -59,7 +59,7 @@ class MyWidget : GlanceAppWidget() {
 
 @Composable
 fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int, boardState: Board) {
-    Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} launch")
+    Log.i("Widget", "updateAppWidgetState for ${boardState.grid[0][0].number},${boardState.grid[0][1].number} save to disk start")
     LaunchedEffect(key1=Unit) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,
@@ -74,9 +74,9 @@ fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:I
                 )
             }
         )
-        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} saved to disk")
+        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number},${boardState.grid[0][1].number} saved to disk")
         //MyWidget().update(context, glanceWidgetId)
-        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} called update()")
+        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number},${boardState.grid[0][1].number} called update()")
     }
 }
 

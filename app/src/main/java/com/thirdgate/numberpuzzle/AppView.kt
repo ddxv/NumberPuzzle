@@ -1,6 +1,5 @@
 package com.thirdgate.numberpuzzle
 
-import android.util.Log
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
@@ -26,8 +25,6 @@ import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 @Composable
 fun NumberGame() {
-
-
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
@@ -75,9 +72,8 @@ fun NumberGame() {
                                 .border(width = 1.dp, color = MaterialTheme.colorScheme.background, shape = RectangleShape)
                                 .clickable {
                                     onCellClick(board, rowIndex, colIndex)
-                                    val updatedBoard = board.value.grid.deepCopy()  // Create a deep copy
-                                    board.value.grid =
-                                        updatedBoard  // Assign the updated board to the state, triggering recomposition
+                                    val updatedBoard = board.value.deepCopy()  // Create a deep copy
+                                    board.value = updatedBoard  // Assign the updated board to the state, triggering recomposition
 
                                 },
                             contentAlignment = Alignment.Center
