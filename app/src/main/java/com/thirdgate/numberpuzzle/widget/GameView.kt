@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +43,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.thirdgate.numberpuzzle.Board
 import com.thirdgate.numberpuzzle.deepCopy
-import com.thirdgate.numberpuzzle.initialBoard
 import com.thirdgate.numberpuzzle.onCellClick
 import com.thirdgate.numberpuzzle.sumInversions
 import com.thirdgate.numberpuzzle.ui.theme.colorSets
@@ -77,11 +78,19 @@ fun PuzzleGameGlance(context:Context) {
     val numWins = widgetInfo.wins
     var rows = widgetInfo.rows
     var columns = widgetInfo.columns
+    var boardState = widgetInfo.boardState
 
     Log.i("Widget", "Start Size=$rows,$columns")
-    val firstBoard =initialBoard(rows = rows, columns = columns)
+    //val firstBoard =initialBoard(rows = rows, columns = columns)
 
-    val board = remember { mutableStateOf(firstBoard) }
+   val board: MutableState<Board>
+    if (boardState == null) {
+        board = remember { mutableStateOf(Board(rows=rows, cols=columns)) }
+    }
+    else{
+        board = remember { mutableStateOf(boardState) }
+    }
+
 
 
     GlanceTheme {
@@ -90,7 +99,7 @@ fun PuzzleGameGlance(context:Context) {
             modifier = GlanceModifier.padding(2.dp).background(endColor),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            itemsIndexed(board.value) { rowIndex, row ->
+            itemsIndexed(board.value.grid) { rowIndex, row ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -121,10 +130,9 @@ fun PuzzleGameGlance(context:Context) {
                                         .background(myBoxColor)
                                         .clickable {
                                             onCellClick(board, rowIndex, colIndex)
-                                            val updatedBoard =
-                                                board.value.deepCopy()
-                                            board.value =
-                                                updatedBoard
+//                                            val updatedBoard = board.value.grid.deepCopy()
+                                            val updatedBoard = board.value.deepCopy()
+                                            board.value = updatedBoard
 
                                         },
                                     contentAlignment = Alignment.Center
@@ -148,7 +156,7 @@ fun PuzzleGameGlance(context:Context) {
                                         )
                                     }
                                 }
-                                if (colIndex < board.value[rowIndex].indices.last) {
+                                if (colIndex < board.value.grid[rowIndex].indices.last) {
                                     Spacer(
                                         modifier = GlanceModifier
                                             .width(2.dp)
@@ -157,7 +165,7 @@ fun PuzzleGameGlance(context:Context) {
                                 }
                             }
                         }
-                        if (rowIndex < board.value[rowIndex].indices.last) {
+                        if (rowIndex < board.value.grid[rowIndex].indices.last) {
                             Spacer(
                                 modifier = GlanceModifier
                                     .height(2.dp)
@@ -169,8 +177,8 @@ fun PuzzleGameGlance(context:Context) {
                 }
             }
             item {
-                val checkInversions = sumInversions(board.value)
-                if ((checkInversions <= 1 && board.value[rows-1][columns-1].number == -1) || isGameOver) {
+                val checkInversions = sumInversions(board.value.grid)
+                if ((checkInversions <= 1 && board.value.grid[rows-1][columns-1].number == -1) || isGameOver) {
                     Spacer(modifier = GlanceModifier.height(32.dp))
                     if (!isGameOver) {
                         isGameOver = true
@@ -181,16 +189,23 @@ fun PuzzleGameGlance(context:Context) {
                             context = context,
                             glanceWidgetId = glanceId,
                             wins = wins,
-                            games = games
+                            games = games,
+                            boardState=board.value
                         )
                     }
                     GameOverView(endColor) {
                         resetCounter++
-                        board.value = initialBoard(rows = rows, columns = columns)
+                        board.value = Board(rows=rows, cols = columns)
                         actionRunCallback<RefreshAction>()
                     }
                 } else {
-                    //GamesWonText(numWins = numWins, games = numGames)
+                    updateWidgetInfo(
+                        context = context,
+                        glanceWidgetId = glanceId,
+                        wins = widgetInfo.wins,
+                        games = widgetInfo.games,
+                        boardState=board.value
+                    )
                 }
             }
 

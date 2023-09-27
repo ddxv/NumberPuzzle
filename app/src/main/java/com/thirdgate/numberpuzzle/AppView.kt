@@ -42,7 +42,7 @@ fun NumberGame() {
 
     val rows = 4
     val columns = 4
-    val board = remember { mutableStateOf(initialBoard(rows = rows, columns = columns)) }
+    val board = remember { mutableStateOf(Board(rows = rows, cols = columns)) }
 
     // Update the index for the next recomposition
     LaunchedEffect(resetCounter) {
@@ -51,7 +51,7 @@ fun NumberGame() {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
         Column(modifier = Modifier.background(Color.Gray).fillMaxWidth()) {
-            board.value.forEachIndexed { rowIndex, row ->
+            board.value.grid.forEachIndexed { rowIndex, row ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     row.forEachIndexed { colIndex, cell ->
                         val positionRatio = if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
@@ -75,8 +75,8 @@ fun NumberGame() {
                                 .border(width = 1.dp, color = MaterialTheme.colorScheme.background, shape = RectangleShape)
                                 .clickable {
                                     onCellClick(board, rowIndex, colIndex)
-                                    val updatedBoard = board.value.deepCopy()  // Create a deep copy
-                                    board.value =
+                                    val updatedBoard = board.value.grid.deepCopy()  // Create a deep copy
+                                    board.value.grid =
                                         updatedBoard  // Assign the updated board to the state, triggering recomposition
 
                                 },
@@ -105,7 +105,7 @@ fun NumberGame() {
         Spacer(modifier = Modifier.height(32.dp))
         ResetButton(startColor) {
             // This will reset the game state
-            board.value = initialBoard(rows, columns)
+            board.value = Board(rows, columns)
             resetCounter++
         }
     }

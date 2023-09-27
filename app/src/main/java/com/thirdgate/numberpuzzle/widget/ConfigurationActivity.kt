@@ -39,6 +39,7 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
+import com.thirdgate.numberpuzzle.Board
 import kotlinx.coroutines.launch
 
 class ConfigurationActivity : ComponentActivity() {
@@ -231,6 +232,7 @@ fun FinishButton(
                             columns = columns,
                             wins = widgetInfo.wins,
                             games = widgetInfo.games,
+                            boardState = Board(rows, columns)
                         )
                     }
                 )

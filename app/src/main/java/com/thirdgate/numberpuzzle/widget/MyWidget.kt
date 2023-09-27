@@ -19,6 +19,7 @@ import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
+import com.thirdgate.numberpuzzle.Board
 
 class MyWidget : GlanceAppWidget() {
 
@@ -54,7 +55,7 @@ class MyWidget : GlanceAppWidget() {
     }
 
 @Composable
-fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int) {
+fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int, boardState: Board) {
     LaunchedEffect(key1=Unit) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,
@@ -65,6 +66,7 @@ fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:I
                     wins = wins,
                     rows = widgetInfo.rows,
                     columns = widgetInfo.columns,
+                    boardState = boardState
                 )
             }
         )
