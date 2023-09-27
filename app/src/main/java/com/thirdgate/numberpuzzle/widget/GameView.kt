@@ -17,9 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.Button
 import androidx.glance.ButtonColors
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalGlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
@@ -28,7 +31,6 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -44,14 +46,14 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.thirdgate.numberpuzzle.Board
-import com.thirdgate.numberpuzzle.deepCopy
+import com.thirdgate.numberpuzzle.R
 import com.thirdgate.numberpuzzle.onCellClick
 import com.thirdgate.numberpuzzle.sumInversions
 import com.thirdgate.numberpuzzle.ui.theme.colorSets
 
 
 @Composable
-fun PuzzleGameGlance(context:Context) {
+fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
 
     // Mutable state to keep track of the current index
     var colorIndex by remember { mutableStateOf(0) }
@@ -73,28 +75,51 @@ fun PuzzleGameGlance(context:Context) {
     }
     val glanceId = LocalGlanceId.current
 
-    val widgetInfo = currentState<WidgetInfo>()
     val numGames = widgetInfo.games
     val numWins = widgetInfo.wins
     var rows = widgetInfo.rows
     var columns = widgetInfo.columns
     var boardState = widgetInfo.boardState
 
-    Log.i("Widget", "Start Size=$rows,$columns")
-    //val firstBoard =initialBoard(rows = rows, columns = columns)
 
    val board: MutableState<Board>
     if (boardState == null) {
         board = remember { mutableStateOf(Board(rows=rows, cols=columns)) }
+        Log.i("Widget", "Start Size=$rows,$columns, ${board.value.grid[0][0].number} create new")
     }
     else{
         board = remember { mutableStateOf(boardState) }
+        Log.i("Widget", "Start Size=$rows,$columns, ${board.value.grid[0][0].number} loaded existing")
     }
 
 
 
     GlanceTheme {
-        GameTitleText(numWins, endColor)
+        Row(modifier = GlanceModifier.fillMaxWidth()){
+        //GameTitleText(numWins, endColor)
+            val displayText =if (numWins > 0)  "Completed Puzzles: $numWins" else "Number Puzzle"
+            Text(
+                text = displayText,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color= ColorProvider(endColor)
+                ),
+                modifier = GlanceModifier.defaultWeight()
+            )
+
+        Image(
+            provider = ImageProvider(R.drawable.round_refresh_24),
+            modifier = GlanceModifier.clickable {
+                board.value = Board(rows = rows, cols = columns)
+                actionRunCallback<RefreshAction>()
+            },
+            contentDescription = "Refresh",
+            colorFilter = ColorFilter.tint(GlanceTheme.colors.onBackground)
+
+        )
+        }
         LazyColumn(
             modifier = GlanceModifier.padding(2.dp).background(endColor),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,7 +135,7 @@ fun PuzzleGameGlance(context:Context) {
                             row.forEachIndexed { colIndex, cell ->
                                 val positionRatio =
                                     if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)
-                                Log.i("Game", "colorpos=$positionRatio")
+                                //Log.i("Game", "colorpos=$positionRatio")
                                 val interpolatedColor =
                                     lerp(startColor, endColor, positionRatio)
 
@@ -199,6 +224,7 @@ fun PuzzleGameGlance(context:Context) {
                         actionRunCallback<RefreshAction>()
                     }
                 } else {
+                    Log.i("Game", "Save board to disk")
                     updateWidgetInfo(
                         context = context,
                         glanceWidgetId = glanceId,
@@ -218,17 +244,16 @@ fun PuzzleGameGlance(context:Context) {
 @Composable
 fun GameTitleText(wins:Int, myColor:Color) {
     val displayText =if (wins > 0)  "Puzzles Completed: $wins" else "Sort starting from 1"
-    Row(horizontalAlignment = Alignment.CenterHorizontally, modifier = GlanceModifier.fillMaxWidth()) {
-        Text(
+    Text(
             text = displayText,
             style = TextStyle(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color= ColorProvider(myColor)
-            )
+            ),
+            modifier = GlanceModifier
         )
-    }
 }
 
 @Composable
@@ -256,7 +281,7 @@ fun GameOverView(myColor:Color, onReset: () -> Unit) {
     )
 }
 
-class RefreshAction : ActionCallback {
+class RefreshAction() : ActionCallback {
     override suspend fun onAction(
         context: Context,
         glanceId: GlanceId,

@@ -12,6 +12,7 @@ data class NumberBlock(var number: Int)
 lateinit var emptyBlockPosition : Pair<Int, Int>
 
 
+
 fun sumInversions(board: Array<Array<NumberBlock>>): Int {
     val rows = board.size
     val cols = board[0].size
@@ -21,7 +22,7 @@ fun sumInversions(board: Array<Array<NumberBlock>>): Int {
         for (j in 0 until cols) {
             for (k in i until rows) {
                 for (l in (if (i == k) j + 1 else 0) until cols) {
-                    Log.i("Game", "countInversion: $i,$j tv=${board[i][j].number} > kl=$k,$l ${board[k][l].number}")
+                    //Log.i("Game", "countInversion: $i,$j tv=${board[i][j].number} > kl=$k,$l ${board[k][l].number}")
                     if (board[i][j].number > board[k][l].number && board[i][j].number != -1 && board[k][l].number != -1) {
                         inversions++
                     }
@@ -35,7 +36,7 @@ fun sumInversions(board: Array<Array<NumberBlock>>): Int {
 
 
 @Serializable
-class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<NumberBlock>>? = null) {
+data class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<NumberBlock>>? = null) {
     var grid: Array<Array<NumberBlock>>
     //var emptyBlockPosition: Pair<Int, Int>  = Pair(0,0)
 

@@ -39,6 +39,9 @@ class MyWidget : GlanceAppWidget() {
             "Content: start"
         )
 
+
+        val widgetInfo = currentState<WidgetInfo>()
+
         GlanceTheme {
             Column(
                 modifier = GlanceModifier
@@ -47,7 +50,7 @@ class MyWidget : GlanceAppWidget() {
                     .background(GlanceTheme.colors.background)
                     .cornerRadius(8.dp)
             ) {
-                            PuzzleGameGlance(context)
+                            PuzzleGameGlance(context, widgetInfo = widgetInfo)
                     }
 
             }
@@ -56,6 +59,7 @@ class MyWidget : GlanceAppWidget() {
 
 @Composable
 fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int, boardState: Board) {
+    Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} launch")
     LaunchedEffect(key1=Unit) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,
@@ -70,9 +74,9 @@ fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:I
                 )
             }
         )
-        Log.i("WidgetConfig", "$glanceWidgetId: updateAppWidgetState done")
-        MyWidget().update(context, glanceWidgetId)
-        Log.i("WidgetConfig", "$glanceWidgetId update done")
+        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} saved to disk")
+        //MyWidget().update(context, glanceWidgetId)
+        Log.i("Widget", "updateAppWidgetState for  ${boardState.grid[0][0].number} called update()")
     }
 }
 
