@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.appWidgetBackground
@@ -19,6 +21,7 @@ import androidx.glance.currentState
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import com.thirdgate.numberpuzzle.Board
+import com.thirdgate.numberpuzzle.MainActivity
 
 class MyWidget : GlanceAppWidget() {
 
@@ -63,7 +66,7 @@ class MyWidget : GlanceAppWidget() {
                     .fillMaxSize()
                     .appWidgetBackground()
                     .background(GlanceTheme.colors.background)
-                    .cornerRadius(8.dp)
+                    .cornerRadius(8.dp).clickable(onClick = actionStartActivity<MainActivity>())
             ) {
                             PuzzleGameGlance(context, widgetInfo = widgetInfo)
                     }
