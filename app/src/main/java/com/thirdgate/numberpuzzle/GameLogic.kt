@@ -9,7 +9,7 @@ import kotlin.math.abs
 data class NumberBlock(var number: Int)
 
 // Top-level variable
-lateinit var emptyBlockPosition : Pair<Int, Int>
+//lateinit var emptyBlockPosition : Pair<Int, Int>
 
 
 
@@ -38,10 +38,22 @@ fun sumInversions(board: Array<Array<NumberBlock>>): Int {
 @Serializable
 data class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<NumberBlock>>? = null) {
     var grid: Array<Array<NumberBlock>>
-    //var emptyBlockPosition: Pair<Int, Int>  = Pair(0,0)
+    var emptyBlockPosition: Pair<Int, Int>
 
     init {
         grid = initialGrid ?: initializeBoard()
+        emptyBlockPosition = findEmptyBlockPosition()
+    }
+
+    private fun findEmptyBlockPosition(): Pair<Int, Int> {
+        grid.forEachIndexed { rowIndex, row ->
+            row.forEachIndexed { colIndex, block ->
+                if (block.number == -1) {
+                    return Pair(rowIndex, colIndex)
+                }
+            }
+        }
+        throw IllegalStateException("No empty block found in the grid")
     }
 
     private fun initializeBoard(): Array<Array<NumberBlock>> {
@@ -98,39 +110,6 @@ data class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<Numb
 
 
 
-//fun initialBoard(rows: Int, columns: Int): Array<Array<NumberBlock>> {
-//    val board = Array(rows) { Array(columns) { NumberBlock(0) } }
-//    val numbers = MutableList((rows * columns)) { it +1 }.apply{shuffle()}
-//
-//    val indexOfMax = numbers.indexOf(numbers.maxOrNull())
-//
-//    // Swap the highest number with the last element
-//    numbers[indexOfMax] = numbers.last()
-//    numbers[numbers.size - 1] = rows * columns
-//    Log.i("Game", "My numbers=$numbers")
-//
-//    // Set one block to -1 (empty)
-//    numbers[numbers.size - 1] = -1
-//
-//
-//    for (r in 0 until rows) {
-//        for (c in 0 until columns) {
-//            val number = numbers[r * columns + c]
-//            board[r][c] = NumberBlock(number)
-//            if (number == -1) {
-//                emptyBlockPosition = Pair(r, c)
-//            }
-//        }
-//    }
-//
-//    if (!isSolvable(board, rows, columns, emptyBlockPosition.first)) {
-//        Log.w("Game", "board not winnable try again")
-//       return initialBoard(rows, columns)
-//    }
-//
-//    return board
-//}
-
 fun Array<Array<NumberBlock>>.deepCopy(): Array<Array<NumberBlock>> {
     return Array(this.size) { this[it].clone() }
 }
@@ -138,6 +117,8 @@ fun Array<Array<NumberBlock>>.deepCopy(): Array<Array<NumberBlock>> {
 
 fun onCellClick(boardState: MutableState<Board>, clickRow: Int, clickCol: Int) {
     val board = boardState.value.grid
+    val emptyBlockPosition = boardState.value.emptyBlockPosition
+
     if (isAdjacentToEmptyBlock(Pair(clickRow, clickCol), emptyBlockPosition)) {
         val clickedBlock = board[clickRow][clickCol]
         board[clickRow][clickCol] = NumberBlock(-1)
@@ -148,7 +129,9 @@ fun onCellClick(boardState: MutableState<Board>, clickRow: Int, clickCol: Int) {
         board[emptyBlockPosition.first][emptyBlockPosition.second].number =
             clickedBlock.number
         // Update the empty block's position
-        emptyBlockPosition = Pair(clickRow, clickCol)
+        Log.i("Click", "Change emptyBlock pos ${boardState.value.emptyBlockPosition}")
+        boardState.value.emptyBlockPosition = Pair(clickRow, clickCol)
+        Log.i("Click", "Changed emptyBlock pos ${boardState.value.emptyBlockPosition}")
         Log.i(
             "Game",
             "click=$clickRow,$clickCol e:$emptyBlockPosition:${board[emptyBlockPosition.first][emptyBlockPosition.second]}"
@@ -173,7 +156,7 @@ fun onCellClick(boardState: MutableState<Board>, clickRow: Int, clickCol: Int) {
         )
         // Update the empty block's position
         board[clickRow][clickCol] = NumberBlock(-1)
-        emptyBlockPosition = Pair(clickRow, clickCol)
+        boardState.value.emptyBlockPosition = Pair(clickRow, clickCol)
     } else if (clickCol == emptyBlockPosition.second) {
         if (emptyBlockPosition.first < clickRow) {
             for (i in emptyBlockPosition.first + 1 until clickRow + 1) {
@@ -194,7 +177,9 @@ fun onCellClick(boardState: MutableState<Board>, clickRow: Int, clickCol: Int) {
         )
         // Update the empty block's position
         board[clickRow][clickCol] = NumberBlock(-1)
-        emptyBlockPosition = Pair(clickRow, clickCol)
+        Log.i("Click", "Change emptyBlock pos ${boardState.value.emptyBlockPosition}")
+        boardState.value.emptyBlockPosition = Pair(clickRow, clickCol)
+        Log.i("Click", "Changed emptyBlock pos ${boardState.value.emptyBlockPosition}")
     } else {
         Log.w("Game", "click $clickRow,$clickCol not adjacent to $emptyBlockPosition")
     }

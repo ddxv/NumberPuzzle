@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -89,9 +90,10 @@ fun NumberGame() {
                                 )
                                 .clickable {
                                     onCellClick(board, rowIndex, colIndex)
-                                    val updatedBoard = board.value.deepCopy()  // Create a deep copy
-                                    board.value =
-                                        updatedBoard  // Assign the updated board to the state, triggering recomposition
+                                    Log.i("Copy", "eb1=${board.value.emptyBlockPosition}")
+                                    val updatedBoard = board.value.deepCopy()
+                                    Log.i("Copy", "eb2=${board.value.emptyBlockPosition}")
+                                    board.value = updatedBoard
 
                                 },
                             contentAlignment = Alignment.Center
