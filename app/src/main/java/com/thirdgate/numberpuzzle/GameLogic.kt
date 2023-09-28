@@ -97,7 +97,7 @@ data class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<Numb
             sumInversions(board) % 2 == 0
         } else { // even
             Log.i("Game", "isSolvable width is even, start")
-            (sumInversions(board) + height - emptyRow) % 2 == 0
+            (sumInversions(board) + height - emptyRow+1) % 2 == 0
         }
     }
     fun deepCopy(): Board {

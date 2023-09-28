@@ -209,7 +209,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
             }
             item {
                 val checkInversions = sumInversions(board.value.grid)
-                if ((checkInversions <= 1 && board.value.grid[rows-1][columns-1].number == -1) || isGameOver) {
+                if ((checkInversions <= 0 && board.value.grid[rows-1][columns-1].number == -1) || isGameOver) {
                     Spacer(modifier = GlanceModifier.height(32.dp))
                     if (!isGameOver) {
                         isGameOver = true
