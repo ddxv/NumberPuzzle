@@ -8,7 +8,6 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.LocalGlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.appWidgetBackground
@@ -42,6 +41,22 @@ class MyWidget : GlanceAppWidget() {
 
         val widgetInfo = currentState<WidgetInfo>()
 
+        if (widgetInfo.boardState == null) {
+            Log.i(
+                "Widget",
+                "board is NULL!"
+            )
+        }
+        else {
+            Log.i(
+                "Widget",
+                "board ${
+                    widgetInfo.boardState.grid.flatMap { it.toList() }
+                        .joinToString(", ") { it.number.toString() }
+                } MyWidget provideGlance loaded board"
+            )
+        }
+
         GlanceTheme {
             Column(
                 modifier = GlanceModifier
@@ -59,7 +74,8 @@ class MyWidget : GlanceAppWidget() {
 
 @Composable
 fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int, boardState: Board) {
-    Log.i("Widget", "updateAppWidgetState for ${boardState.grid[0][0].number},${boardState.grid[0][1].number} save to disk start")
+    Log.i("Widget", "board ${boardState.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} updateWidgetInfo launch save info!")
+
     LaunchedEffect(key1=Unit) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,

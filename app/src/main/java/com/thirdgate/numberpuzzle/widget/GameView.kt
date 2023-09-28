@@ -84,7 +84,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
 
    val board: MutableState<Board>
     if (boardState == null) {
-        board = remember { mutableStateOf(Board(rows=rows, cols=columns)) }
+        board = remember{ mutableStateOf(Board(rows=rows, cols=columns)) }
         Log.i("Widget", "Start Size=$rows,$columns: ${board.value.grid[0][0].number},${board.value.grid[0][1].number} create new")
     }
     else{
@@ -92,7 +92,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
         Log.i("Widget", "Start Size=$rows,$columns: ${board.value.grid[0][0].number},${board.value.grid[0][1].number} loaded existing")
     }
 
-
+    Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }}")
 
     GlanceTheme {
         Row(modifier = GlanceModifier.fillMaxWidth()){
@@ -155,8 +155,10 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
                                         .background(myBoxColor)
                                         .clickable {
                                             onCellClick(board, rowIndex, colIndex)
+                                            Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} deepCopy before")
                                             val updatedBoard = board.value.deepCopy()
                                             board.value = updatedBoard
+                                            Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} deepCopy after")
 
                                         },
                                     contentAlignment = Alignment.Center
