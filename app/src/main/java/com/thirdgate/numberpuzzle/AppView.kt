@@ -1,11 +1,19 @@
 package com.thirdgate.numberpuzzle
 
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,9 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.thirdgate.numberpuzzle.ui.theme.colorSets
+import com.thirdgate.numberpuzzle.widget.GameWidgetReceiver
+import com.thirdgate.numberpuzzle.widget.MyWidget
 
 @Composable
 fun NumberGame() {
@@ -47,7 +58,9 @@ fun NumberGame() {
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
-        Column(modifier = Modifier.background(Color.Gray).fillMaxWidth()) {
+        Column(modifier = Modifier
+            .background(Color.Gray)
+            .fillMaxWidth()) {
             board.value.grid.forEachIndexed { rowIndex, row ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     row.forEachIndexed { colIndex, cell ->
@@ -69,11 +82,16 @@ fun NumberGame() {
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(myBoxColor)
-                                .border(width = 1.dp, color = MaterialTheme.colorScheme.background, shape = RectangleShape)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.background,
+                                    shape = RectangleShape
+                                )
                                 .clickable {
                                     onCellClick(board, rowIndex, colIndex)
                                     val updatedBoard = board.value.deepCopy()  // Create a deep copy
-                                    board.value = updatedBoard  // Assign the updated board to the state, triggering recomposition
+                                    board.value =
+                                        updatedBoard  // Assign the updated board to the state, triggering recomposition
 
                                 },
                             contentAlignment = Alignment.Center
@@ -109,8 +127,37 @@ fun NumberGame() {
 
 @Composable
 fun ResetButton(myColor:Color, onClick: () -> Unit) {
-    androidx.compose.material3.Button(onClick = onClick,
+    Button(onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = myColor)
     ) { Text("Reset")
     }
 }
+
+@Composable
+fun PinWidgetButton() {
+    val context = LocalContext.current
+
+    val appWidgetManager = AppWidgetManager.getInstance(context)
+    val myProvider = ComponentName(context, GameWidgetReceiver::class.java)
+
+    Button(onClick = {
+        if (appWidgetManager.isRequestPinAppWidgetSupported()) {
+            // Create the PendingIntent object only if your app needs to be notified
+            // when the user chooses to pin the widget. Note that if the pinning
+            // operation fails, your app isn't notified. This callback receives the ID
+            // of the newly pinned widget (EXTRA_APPWIDGET_ID).
+//            val successCallback = PendingIntent.getBroadcast(
+//                context,
+//                0,
+//                Intent(),
+//                PendingIntent.FLAG_UPDATE_CURRENT
+//            )
+
+            appWidgetManager.requestPinAppWidget(myProvider, null, null)
+        }
+    }) {
+        Text(text = "Add Widget to Home Screen")
+    }
+}
+
+

@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -88,9 +90,15 @@ fun MainContent() {
             Modifier
                 .fillMaxSize()
                 .padding(padding)){
+
+            Row(modifier = Modifier.align(Alignment.CenterHorizontally)){
+                PinWidgetButton()
+            }
+
             Text(
                 text = "Hi, this is a simple puzzle game. It comes with a widget, so feel free to try that out too!", modifier=Modifier.padding(20.dp)
             )
+
             NumberGame()
         }
     }

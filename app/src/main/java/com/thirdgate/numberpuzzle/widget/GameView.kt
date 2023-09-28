@@ -36,6 +36,8 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -101,7 +103,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
             Text(
                 text = displayText,
                 style = TextStyle(
-                    fontSize = 24.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color= ColorProvider(endColor)
@@ -114,7 +116,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
             modifier = GlanceModifier.clickable {
                 board.value = Board(rows = rows, cols = columns)
                 actionRunCallback<RefreshAction>()
-            },
+            }.padding(4.dp),
             contentDescription = "Refresh",
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onBackground)
 
