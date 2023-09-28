@@ -120,10 +120,12 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
 
         )
         }
+        Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} LazyRow Before")
         LazyColumn(
             modifier = GlanceModifier.padding(2.dp).background(endColor),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} LazyRow Inside, before start")
             itemsIndexed(board.value.grid) { rowIndex, row ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,6 +134,7 @@ fun PuzzleGameGlance(context:Context, widgetInfo:WidgetInfo) {
                         modifier = GlanceModifier.background(Color.Gray).fillMaxWidth()
                     ) {
                         Row(modifier = GlanceModifier.fillMaxWidth()) {
+                            Log.i("Widget", "board ${board.value.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} LazyRow Inside cell")
                             row.forEachIndexed { colIndex, cell ->
                                 val positionRatio =
                                     if (cell.number == -1) 1f else (cell.number - 1).toFloat() / (rows * columns - 1)

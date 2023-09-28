@@ -76,7 +76,7 @@ class MyWidget : GlanceAppWidget() {
 fun updateWidgetInfo(context:Context, glanceWidgetId:GlanceId, wins:Int, games:Int, boardState: Board) {
     Log.i("Widget", "board ${boardState.grid.flatMap { it.toList() }.joinToString(", ") { it.number.toString() }} updateWidgetInfo launch save info!")
 
-    LaunchedEffect(key1=Unit) {
+    LaunchedEffect(key1=boardState) {
         updateAppWidgetState(context = context,
             glanceId = glanceWidgetId,
             definition = MyWidgetStateDefinition(),

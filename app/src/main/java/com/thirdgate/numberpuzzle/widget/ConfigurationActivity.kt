@@ -103,7 +103,7 @@ fun ConfigurationScreen(
     var widgetInfo by remember { mutableStateOf(WidgetInfo()) }
     var isLoaded by remember { mutableStateOf(false) }  // <-- New loading state
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1=Unit) {
         try {
             widgetInfo = glanceApp.getAppWidgetState<WidgetInfo>(context, glanceWidgetId)
             isLoaded = true  // <-- Update the state once data is loaded

@@ -67,7 +67,7 @@ data class Board(val rows: Int, val cols: Int, val initialGrid: Array<Array<Numb
             }
         }
 
-        if (!isSolvable(board, rows, cols, emptyBlockPosition!!.first)) {
+        if (!isSolvable(board, rows, cols, emptyRow=emptyBlockPosition.first)) {
             return initializeBoard()
         }
 
