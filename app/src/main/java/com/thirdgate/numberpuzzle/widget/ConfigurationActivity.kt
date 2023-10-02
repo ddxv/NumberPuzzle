@@ -191,7 +191,6 @@ fun RowsGroup(
                                 onSelectedChanged(size)
                             },
                             colors = ButtonDefaults.buttonColors(
-                                //backgroundColor = if (selectedRowSize == size) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                                 contentColor = if (selectedRowSize == size) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                             ),
                             modifier = Modifier.padding(horizontal = 8.dp),

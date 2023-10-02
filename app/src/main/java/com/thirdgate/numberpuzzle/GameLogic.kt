@@ -8,10 +8,6 @@ import kotlin.math.abs
 @Serializable
 data class NumberBlock(var number: Int)
 
-// Top-level variable
-//lateinit var emptyBlockPosition : Pair<Int, Int>
-
-
 
 fun sumInversions(board: Array<Array<NumberBlock>>): Int {
     val rows = board.size

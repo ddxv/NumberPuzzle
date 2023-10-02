@@ -22,14 +22,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.thirdgate.numberpuzzle.ui.theme.NumberPuzzleTheme
@@ -64,7 +62,6 @@ fun MainContent() {
                 Text(text = "Number Puzzle Widget")
             },
             Modifier.background(color = MaterialTheme.colorScheme.primary),
-            //contentColor = MaterialTheme.colors.onPrimary,
             actions = {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "Settings")
@@ -96,7 +93,7 @@ fun MainContent() {
             }
 
             Text(
-                text = "Hi, this is a simple puzzle game. It comes with a widget, so feel free to try that out too!", modifier=Modifier.padding(20.dp)
+                text = "Hi, this is a simple puzzle game. To win sort the numbers 1 - 15 with the empty block at the end. It comes with a widget, so feel free to try that out too!", modifier=Modifier.padding(20.dp)
             )
 
             NumberGame()
